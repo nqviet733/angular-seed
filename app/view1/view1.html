@@ -1,0 +1,15 @@
+<div ng-controller="View1Ctrl" class="container">
+    <p>This is the partial for view 1.</p>
+
+    <div class="row" style="border-left: 1px solid #ddd;border-top: 1px solid #ddd;">
+        <div class="col-sm-3" ng-repeat="product in products" style="border-right: 1px solid #ddd;border-bottom: 1px solid #ddd; cursor: pointer" ng-click="sayHello()">
+            <span style="text-align: center">{{product.title}}</span>
+            <div style="text-align: center">
+                <a href="#/details/{{product.id}}" class="thumb"><img src="{{product.imgUrl}}"></a>
+            </div>
+            <span style="color: red">Price: {{product.price}}</span></br>
+            <span>{{product.detailPage}}</span>
+        </div>
+    </div>
+
+</div>
