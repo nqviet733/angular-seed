@@ -10,6 +10,32 @@
             <span style="color: red">Price: {{product.price}}</span></br>
             <span>{{product.detailPage}}</span>
         </div>
+
+        <p>
+            <button popover-placement="right" popover-template="view1/pop-over.html" class="btn btn-default">Date Picker</button>
+        </p>
+
+
+
     </div>
 
+
+
+<script id="calendar.html" type="text/ng-template">
+    <div ng-model="date">
+        <datepicker show-weeks="false"></datepicker>
+    </div>
+    <hr />
+    <div class="alert alert-success"></div>
+</script>
+
+<script id="template.html" type="text/ng-template">
+    <div class="popover">
+        <div class="arrow"></div>
+        <h3 class="popover-title" ng-bind="title" ng-show="title">hello</h3>
+        <div class="popover-content" ng-bind="content">hello</div>
+        </div>
+</script>
+
 </div>
+<!-- https://github.com/jbruni/bootstrap-bower-jbruni -->

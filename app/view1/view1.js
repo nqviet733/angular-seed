@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.view1', ['ngRoute'])
+angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap'])
 
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider
@@ -50,7 +50,13 @@ angular.module('myApp.view1', ['ngRoute'])
         $scope.sayHello = function () {
             console.log("Hello Everyone!");
         }
-
+        $scope.popover = {
+            "title": "Title",
+            "content": "Hello Popover<br />This is a multiline message!",
+            "saved": true
+        };
+        $scope.date = new Date();
+        $scope.text = 'Click a date to check the binding.';
     }])
 
 
