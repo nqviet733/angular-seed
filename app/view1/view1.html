@@ -2,8 +2,10 @@
     <p>This is the partial for view 1.</p>
 
     <div class="row" style="border-left: 1px solid #ddd;border-top: 1px solid #ddd;">
-        <div class="col-sm-3" ng-repeat="product in products" style="border-right: 1px solid #ddd;border-bottom: 1px solid #ddd; cursor: pointer" ng-click="sayHello()">
+        <div class="col-sm-3" ng-repeat="product in products"
+             style="border-right: 1px solid #ddd;border-bottom: 1px solid #ddd; cursor: pointer" ng-click="sayHello()">
             <span style="text-align: center">{{product.title}}</span>
+
             <div style="text-align: center">
                 <a href="#/details/{{product.id}}" class="thumb"><img src="{{product.imgUrl}}"></a>
             </div>
@@ -12,14 +14,15 @@
         </div>
 
         <p>
-            <button popover-placement="right" popover-template="view1/pop-over.html" class="btn btn-default">Date Picker</button>
+            <button popover-placement="right" popover-template="calendar.html" class="btn btn-default">Date
+                Picker
+            </button>
         </p>
-
-
 
     </div>
 
-
+    <button class="btn btn-danger" ng-click="launch('error')">Error Dialog</button>
+    <button class="btn btn-default" ng-click="launch('notify')">Notify Dialog</button>
 
 <script id="calendar.html" type="text/ng-template">
     <div ng-model="date">
@@ -38,4 +41,7 @@
 </script>
 
 </div>
-<!-- https://github.com/jbruni/bootstrap-bower-jbruni -->
+<!--
+    https://github.com/jbruni/bootstrap-bower-jbruni
+    http://localhost:8000/app/
+-->

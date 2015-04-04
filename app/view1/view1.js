@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap'])
+angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pascalprecht.translate', 'dialogs.default-translations'])
 
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider
@@ -13,10 +13,48 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap'])
                 controller: 'DetailCtrl'
             });
     }])
+    .config(['dialogsProvider','$translateProvider',function(dialogsProvider,$translateProvider){
+        dialogsProvider.useBackdrop('static');
+        dialogsProvider.useEscClose(false);
+        dialogsProvider.useCopy(false);
+        dialogsProvider.setSize('sm');
+
+        $translateProvider.translations('es',{
+            DIALOGS_ERROR: "Error",
+            DIALOGS_ERROR_MSG: "Se ha producido un error desconocido.",
+            DIALOGS_CLOSE: "Cerca",
+            DIALOGS_PLEASE_WAIT: "Espere por favor",
+            DIALOGS_PLEASE_WAIT_ELIPS: "Espere por favor...",
+            DIALOGS_PLEASE_WAIT_MSG: "Esperando en la operacion para completar.",
+            DIALOGS_PERCENT_COMPLETE: "% Completado",
+            DIALOGS_NOTIFICATION: "Notificacion",
+            DIALOGS_NOTIFICATION_MSG: "Notificacion de aplicacion Desconocido.",
+            DIALOGS_CONFIRMATION: "Confirmacion",
+            DIALOGS_CONFIRMATION_MSG: "Se requiere confirmacion.",
+            DIALOGS_OK: "Bueno",
+            DIALOGS_YES: "Si",
+            DIALOGS_NO: "No"
+        });
+
+        $translateProvider.preferredLanguage('en-US');
+    }])
 
 
+    //Very important! We should inject dependencies even thought they're not
+    .controller('View1Ctrl', ['$scope','$rootScope', '$timeout', '$translate', 'dialogs', function ($scope, $rootScope, $timeout, $translate, dialogs) {
 
-    .controller('View1Ctrl', ['$scope', function ($scope) {
+        $scope.lang = 'en-US';
+        $scope.language = 'English';
+
+        var _progress = 33;
+
+        $scope.name = '';
+        $scope.confirmed = 'No confirmation yet!';
+
+        $scope.custom = {
+            val: 'Initial Value'
+        };
+
         $scope.products = [
             {
                 id: 1,
@@ -57,6 +95,16 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap'])
         };
         $scope.date = new Date();
         $scope.text = 'Click a date to check the binding.';
+        $scope.launch = function(which) {
+            switch(which) {
+                case 'error':
+                    dialogs.error();
+                    break;
+                case 'notify':
+                    dialogs.notify();
+                    break;
+            }
+        }
     }])
 
 
