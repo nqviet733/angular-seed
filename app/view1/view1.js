@@ -41,7 +41,7 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pasca
 
 
     //Very important! We should inject dependencies even thought they're not
-    .controller('View1Ctrl', ['$scope','$rootScope', '$timeout', '$translate', 'dialogs', function ($scope, $rootScope, $timeout, $translate, dialogs) {
+    .controller('View1Ctrl', ['$scope','$rootScope', '$timeout', '$translate', 'dialogs', '$filter', function ($scope, $rootScope, $timeout, $translate, dialogs, $filter) {
 
         $scope.lang = 'en-US';
         $scope.language = 'English';
@@ -60,31 +60,44 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pasca
                 id: 1,
                 title: "product1",
                 imgUrl: "view1/img.jpg",
-                price: "20$",
+                price: 20,
                 detailPage: "detailURl"
             },
             {
                 id: 2,
                 title: "product2",
                 imgUrl: "view1/img.jpg",
-                price: "20$",
+                price: 30,
                 detailPage: "detailURl"
             },
             {
                 id: 3,
                 title: "product3",
                 imgUrl: "view1/img.jpg",
-                price: "20$",
+                price: 40,
                 detailPage: "detailURl"
             },
             {
                 id: 4,
-                title: "product1",
+                title: "product4",
                 imgUrl: "view1/img.jpg",
-                price: "20$",
+                price: 50,
                 detailPage: "detailURl"
             },
         ]
+        $scope.greaterThan = function(product, from, to){
+            console.log(from);
+            if(from === undefined && from === undefined) {
+                return true;
+            }
+            if(from !== undefined && from === undefined) {
+                return product.price >= from;
+            }
+            if(from === undefined && to !== undefined) {
+                return product.price <= to;
+            }
+            return product.price >= from && product.price <= to;
+        }
         $scope.sayHello = function () {
             console.log("Hello Everyone!");
         }
@@ -105,8 +118,31 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pasca
                     break;
             }
         }
+        $scope.getProductsByPrice = function(item) {
+            //item is object that we want to compare to
+            //$scope.from & $scope.to are get from the inputs
+            console.log($scope.from);
+            console.log($scope.to);
+            return item.price >= $scope.from && item.price <= $scope.to;
+        };
     }])
 
+
+    .filter('findProductPrice', function () {
+        return function (items, from, to) {
+            //items are objects that we want to compare to
+            //from & to are get from the inputs
+            console.log(items);
+            var newItems = [];
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].price >= from && items[i].price <= to) {
+                    newItems.push(items[i]);
+                }
+            };
+
+            return newItems;
+        }
+    })
 
     .controller('DetailCtrl', ['$scope', '$routeParams', function ($scope, $routeParams) {
         $scope.id = $routeParams.id;

@@ -1,10 +1,15 @@
-<div ng-controller="View1Ctrl" class="container">
+<div ng-controller="View1Ctrl" class="container" xmlns="http://www.w3.org/1999/html">
     <p>This is the partial for view 1.</p>
-
+    <input type="text" class="form-control" placeholder="Search for.." ng-model="product.title">
+    <input type="number" class="form-control" placeholder="Price from.." ng-model="from">
+    <input type="number" class="form-control" placeholder="Price to.." ng-model="to">
+    <br/>
     <div class="row" style="border-left: 1px solid #ddd;border-top: 1px solid #ddd;">
-        <div class="col-sm-3" ng-repeat="product in products"
+        <!-- Two ways to filter -->
+        <!-- <div class="col-sm-3" ng-repeat="product in products | filter:product | findProductPrice:from:to" -->
+        <div class="col-sm-3" ng-repeat="product in products | filter:product | filter: getProductsByPrice"
              style="border-right: 1px solid #ddd;border-bottom: 1px solid #ddd; cursor: pointer" ng-click="sayHello()">
-            <span style="text-align: center">{{product.title}}</span>
+            <span style="text-align: center">{{product.title | reverse}}</span>
 
             <div style="text-align: center">
                 <a href="#/details/{{product.id}}" class="thumb"><img src="{{product.imgUrl}}"></a>
@@ -13,9 +18,10 @@
             <span>{{product.detailPage}}</span>
         </div>
     </div>
+    <br/>
     <button class="btn btn-danger" ng-click="launch('error')">Error Dialog</button>
     <button class="btn btn-default" ng-click="launch('notify')">Notify Dialog</button>
-    <button popover-placement="right" popover-template="view1/pop-over.html" class="btn btn-default">Date Picker
+    <button popover-placement="right" popover-template="view1/pop-over.html" popover-trigger="mouseenter" class="btn btn-default">Date Picker
     </button>
 </div>
 <!--
