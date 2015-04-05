@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pascalprecht.translate', 'dialogs.default-translations'])
+angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pascalprecht.translate', 'dialogs.default-translations', 'ngResource'])
 
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider
@@ -39,12 +39,30 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pasca
         $translateProvider.preferredLanguage('en-US');
     }])
 
+    .service('getFileService', ['$http', '$q', function ($http, $q) {
+
+        this.getData = function () {
+            var q = $q.defer();
+            $http.get('view1/data.json', {headers: {accept: "application/json"}})
+                .success(function (result) {
+                    q.resolve(result);
+                })
+                .error(function (err) {
+                    q.reject(err);
+                });
+            return q.promise;
+        };
+    }])
 
     //Very important! We should inject dependencies even thought they're not
-    .controller('View1Ctrl', ['$scope','$rootScope', '$timeout', '$translate', 'dialogs', '$filter', function ($scope, $rootScope, $timeout, $translate, dialogs, $filter) {
+    .controller('View1Ctrl', ['$scope','$rootScope', '$timeout', '$translate', 'dialogs', '$filter', 'getFileService', function ($scope, $rootScope, $timeout, $translate, dialogs, $filter, getFileService) {
 
         $scope.lang = 'en-US';
         $scope.language = 'English';
+
+        /*getFileService.getData().then(function(result){
+            console.log(result);
+        })*/
 
         var _progress = 33;
 
@@ -108,8 +126,8 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pasca
         $scope.getProductsByPrice = function(item) {
             //item is object that we want to compare to
             //$scope.from & $scope.to are get from the inputs
-            console.log($scope.from);
-            console.log($scope.to);
+            //console.log($scope.from);
+            //console.log($scope.to);
             return item.price >= ($scope.from === undefined || $scope.from === null ? 0 : $scope.from)
                 && item.price <= ($scope.to === undefined || $scope.to === null ? 100 : $scope.to) ;
         };
@@ -120,7 +138,7 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pasca
         return function (items, from, to) {
             //items are objects that we want to compare to
             //from & to are get from the inputs
-            console.log(items);
+            //console.log(items);
             var newItems = [];
             for (var i = 0; i < items.length; i++) {
                 if (items[i].price >= (from === undefined || from === null ? 0 : from)
@@ -133,6 +151,20 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pasca
         }
     })
 
-    .controller('DetailCtrl', ['$scope', '$routeParams', function ($scope, $routeParams) {
+    .controller('DetailCtrl', ['$scope', '$routeParams', 'getFileService', 'Data', function ($scope, $routeParams, getFileService, Data) {
         $scope.id = $routeParams.id;
+        $scope.data = [];
+        getFileService.getData().then(function(result){
+            ///console.log(result);
+        })
+        $scope.data = Data.get({id: $scope.id}, function(data) {
+            console.log(data);
+        });
+
     }])
+    .factory('Data', ['$resource', function ($resource) {
+        return $resource('view1/:id.json', {}, {
+            query: {method: 'GET', params: {id: 'details'}, isArray: true}
+        });
+    }])
+

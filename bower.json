@@ -13,6 +13,7 @@
         "angular-translate": "2.0.1",
         "angular-loader": "1.2.x",
         "angular-mocks": "~1.2.x",
+        "angular-resource": "~1.2.x",
         "html5-boilerplate": "~4.3.0",
         "angular-dialog-service": "5.2.6"
     },
