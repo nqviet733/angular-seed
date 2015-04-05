@@ -85,19 +85,6 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pasca
                 detailPage: "detailURl"
             },
         ]
-        $scope.greaterThan = function(product, from, to){
-            console.log(from);
-            if(from === undefined && from === undefined) {
-                return true;
-            }
-            if(from !== undefined && from === undefined) {
-                return product.price >= from;
-            }
-            if(from === undefined && to !== undefined) {
-                return product.price <= to;
-            }
-            return product.price >= from && product.price <= to;
-        }
         $scope.sayHello = function () {
             console.log("Hello Everyone!");
         }
@@ -123,7 +110,8 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pasca
             //$scope.from & $scope.to are get from the inputs
             console.log($scope.from);
             console.log($scope.to);
-            return item.price >= $scope.from && item.price <= $scope.to;
+            return item.price >= ($scope.from === undefined || $scope.from === null ? 0 : $scope.from)
+                && item.price <= ($scope.to === undefined || $scope.to === null ? 100 : $scope.to) ;
         };
     }])
 
@@ -135,7 +123,8 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pasca
             console.log(items);
             var newItems = [];
             for (var i = 0; i < items.length; i++) {
-                if (items[i].price >= from && items[i].price <= to) {
+                if (items[i].price >= (from === undefined || from === null ? 0 : from)
+                    && items[i].price <= (to === undefined || to === null ? 100 : to)) {
                     newItems.push(items[i]);
                 }
             };

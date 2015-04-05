@@ -9,7 +9,7 @@
         <!-- <div class="col-sm-3" ng-repeat="product in products | filter:product | findProductPrice:from:to" -->
         <div class="col-sm-3" ng-repeat="product in products | filter:product | filter: getProductsByPrice"
              style="border-right: 1px solid #ddd;border-bottom: 1px solid #ddd; cursor: pointer" ng-click="sayHello()">
-            <span style="text-align: center">{{product.title | reverse}}</span>
+            <span style="text-align: center">{{product.title}}</span>
 
             <div style="text-align: center">
                 <a href="#/details/{{product.id}}" class="thumb"><img src="{{product.imgUrl}}"></a>
