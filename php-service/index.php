@@ -3,8 +3,11 @@ require 'Slim/Slim.php';
 
 \Slim\Slim::registerAutoloader();
 
-$app = new \Slim\Slim();
+$app = new \Slim\Slim(array(
+    'debug' => true
+));
 
+$app->post('/login', 'checkAuthentication');
 $app->get('/authenticate', 'generateAPIKey');
 $app->get('/friends', 'authenticate','getFriends');
 $app->get('/friend/:id',  'getFriend');
@@ -14,6 +17,30 @@ $app->delete('/friend/:id', 'deleteFriend');
 $app->get('/friend/search/:query', 'findByName');
 
 $app->run();
+
+//curl -i -X POST -H 'Content-Type: application/json' -d '{"username":"ntkthoa","password":"123456"}' http://127.0.0.1:8080/php-service/login
+function checkAuthentication() {
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $data = json_decode($body);
+    $sql = "SELECT * FROM user_tb WHERE user_name=:username and pass_word=:password";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("username", $data->username);
+        $stmt->bindParam("password", $data->password);
+        $stmt->execute();
+        if($hello = $stmt->fetchObject()) {
+            echo json_encode(true);
+        } else {
+            echo json_encode(false);
+        }
+        $db = null;
+        //echo '{"friends": ' . json_encode($hello) . '}';
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
 
 // route middleware for simple API authentication
 function authenticate(\Slim\Route $route) {
