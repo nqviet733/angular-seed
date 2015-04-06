@@ -5,7 +5,8 @@ require 'Slim/Slim.php';
 
 $app = new \Slim\Slim();
 
-$app->get('/friends', 'getFriends');
+$app->get('/authenticate', 'generateAPIKey');
+$app->get('/friends', 'authenticate','getFriends');
 $app->get('/friend/:id',  'getFriend');
 $app->post('/friends', 'addFriend');
 $app->put('/friend/:id', 'updateFriend');
@@ -14,6 +15,38 @@ $app->get('/friend/search/:query', 'findByName');
 
 $app->run();
 
+// route middleware for simple API authentication
+function authenticate(\Slim\Route $route) {
+    $app = \Slim\Slim::getInstance();
+    $uid = $app->getEncryptedCookie('uid');
+    $key = $app->getEncryptedCookie('key');
+    if (validateUserKey($uid, $key) === false) {
+      $app->halt(401);
+    }
+}
+
+function validateUserKey($uid, $key) {
+  // insert your (hopefully more complex) validation routine here
+  if ($uid == 'demo' && $key == 'demo') {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// generates a temporary API key using cookies
+// call this first to gain access to protected API methods
+function generateAPIKey() {
+$app = \Slim\Slim::getInstance();
+  try {
+    $app->setEncryptedCookie('uid', 'demo', '5 minutes');
+    $app->setEncryptedCookie('key', 'demo', '5 minutes');
+  } catch (Exception $e) {
+    $app->response()->status(400);
+    $app->response()->header('X-Status-Reason', $e->getMessage());
+  }
+};
+
 function getFriends() {
     $sql = "SELECT id, name, job FROM friends";
     try {
@@ -21,7 +54,7 @@ function getFriends() {
         $stmt = $db->query($sql);
         $hello = $stmt->fetchAll(PDO::FETCH_OBJ);
         $db = null;
-        echo '{"hello": ' . json_encode($hello) . '}';
+        echo '{"friends": ' . json_encode($hello) . '}';
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
