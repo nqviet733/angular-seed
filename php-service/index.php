@@ -1,16 +1,17 @@
 <?php
 require 'Slim/Slim.php';
-
+define('TIMEZONE', 'Asia/Ho_Chi_Minh');
+date_default_timezone_set(TIMEZONE);
 \Slim\Slim::registerAutoloader();
 
 $app = new \Slim\Slim(array(
     'debug' => true
 ));
 
-$app->get('/session/:id', 'checkSession');
+$app->get('/session/:uid/:sid', 'validateSession');
 $app->post('/login', 'checkAuthentication');
 $app->get('/authenticate', 'generateAPIKey');
-$app->get('/friends', 'authenticate','getFriends');
+$app->get('/friends', 'authenticateSession','getFriends');
 $app->get('/friend/:id',  'getFriend');
 $app->post('/friends', 'addFriend');
 $app->put('/friend/:id', 'updateFriend');
@@ -38,6 +39,8 @@ function checkAuthentication() {
             if ($status == null) {
                 generateSession($hello->id, $data->username . $data->password);
             } else {
+                //TODO: this should check session valid before update it
+                updateSession($hello->id);
                 echo json_encode("existing: ".$status);
             }
         } else {
@@ -62,20 +65,86 @@ function setSessionOnBrowser($user_id, $session_id) {
 // route middleware for simple API authentication
 function authenticateSession(\Slim\Route $route) {
     $app = \Slim\Slim::getInstance();
-    $uid = $app->getEncryptedCookie('user_id');
-    $key = $app->getEncryptedCookie('session_id');
-    if (validateUserKey($uid, $key) === false) {
+    $user_id = $app->getEncryptedCookie('user_id');
+    $session_id = $app->getEncryptedCookie('session_id');
+    if (validateSession($user_id, $session_id) === false) {
         $app->halt(401);
     }
 }
 
-function generateSession($user_id, $session_id) {
-    $sql = "INSERT INTO last_login_tb (user_id, session_id) VALUES (:user_id, :session_id)";
+function validateSession($user_id, $session_id){
+    $sql = "SELECT * FROM last_login_tb WHERE user_id=:user_id and session_id=:session_id";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);
         $stmt->bindParam("user_id", $user_id);
         $stmt->bindParam("session_id", $session_id);
+        $stmt->execute();
+        if ($hello = $stmt->fetchObject()) {
+            $db = null;
+
+            $tz_object = new DateTimeZone('Asia/Ho_Chi_Minh');
+            $sysdate = new DateTime();
+            $sysdate->setTimezone($tz_object);
+            $dbdate = new DateTime($hello->last_login_time);
+            $dbdate->setTimezone($tz_object);
+
+            echo json_encode($sysdate);
+            echo json_encode($dbdate);
+
+            $since_start = $sysdate->diff($dbdate);
+            $minutes = $since_start->days * 24 * 60;
+            $minutes += $since_start->h * 60;
+            $minutes += $since_start->i;
+
+            echo json_encode($minutes);
+
+            //TODO: if $minutes > 10 delete session else updateSession()
+            return true;
+        } else {
+            return false;
+        }
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+function updateSession($user_id) {
+    $sql = "UPDATE last_login_tb SET last_login_time=:last_login_time where user_id=:user_id";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+
+        $tz_object = new DateTimeZone('Asia/Ho_Chi_Minh');
+        $sysdate = new DateTime();
+        $sysdate->setTimezone($tz_object);
+        $caldate = $sysdate->format('Y-m-d H:i:s');
+        $stmt->bindParam("last_login_time", $caldate);
+
+        $stmt->bindParam("user_id", $user_id);
+        $stmt->execute();
+        $db = null;
+        echo json_encode("success");
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+function generateSession($user_id, $session_id) {
+    $sql = "INSERT INTO last_login_tb (user_id, session_id, last_login_time) VALUES (:user_id, :session_id, :last_login_time)";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("user_id", $user_id);
+        $stmt->bindParam("session_id", $session_id);
+
+        $tz_object = new DateTimeZone('Asia/Ho_Chi_Minh');
+        $sysdate = new DateTime();
+        $sysdate->setTimezone($tz_object);
+        echo json_encode(new DateTime());
+        $caldate = $sysdate->format('Y-m-d H:i:s');
+        $stmt->bindParam("last_login_time", $caldate);
+
         $stmt->execute();
         if($db->lastInsertId()) {
             echo json_encode("new: ".$session_id);
@@ -113,30 +182,30 @@ function authenticate(\Slim\Route $route) {
     $uid = $app->getEncryptedCookie('uid');
     $key = $app->getEncryptedCookie('key');
     if (validateUserKey($uid, $key) === false) {
-      $app->halt(401);
+        $app->halt(401);
     }
 }
 
 function validateUserKey($uid, $key) {
-  // insert your (hopefully more complex) validation routine here
-  if ($uid == 'demo' && $key == 'demo') {
-    return true;
-  } else {
-    return false;
-  }
+    // insert your (hopefully more complex) validation routine here
+    if ($uid == 'demo' && $key == 'demo') {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 // generates a temporary API key using cookies
 // call this first to gain access to protected API methods
 function generateAPIKey() {
-$app = \Slim\Slim::getInstance();
-  try {
-    $app->setEncryptedCookie('uid', 'demo', '5 minutes');
-    $app->setEncryptedCookie('key', 'demo', '5 minutes');
-  } catch (Exception $e) {
-    $app->response()->status(400);
-    $app->response()->header('X-Status-Reason', $e->getMessage());
-  }
+    $app = \Slim\Slim::getInstance();
+    try {
+        $app->setEncryptedCookie('uid', 'demo', '5 minutes');
+        $app->setEncryptedCookie('key', 'demo', '5 minutes');
+    } catch (Exception $e) {
+        $app->response()->status(400);
+        $app->response()->header('X-Status-Reason', $e->getMessage());
+    }
 };
 
 function getFriends() {
@@ -239,6 +308,7 @@ function getConnection() {
     $dbpass="vertrigo";
     $dbname="slim_db";
     $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);
+    $dbh->exec("SET time_zone='Asia/Ho_Chi_Minh'");
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return $dbh;
 }
