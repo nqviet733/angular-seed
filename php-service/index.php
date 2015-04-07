@@ -48,6 +48,27 @@ function checkAuthentication() {
     }
 }
 
+function setSessionOnBrowser($user_id, $session_id) {
+    $app = \Slim\Slim::getInstance();
+    try {
+        $app->setEncryptedCookie('user_id', $user_id, '5 minutes');
+        $app->setEncryptedCookie('session_id', $session_id, '5 minutes');
+    } catch (Exception $e) {
+        $app->response()->status(400);
+        $app->response()->header('X-Status-Reason', $e->getMessage());
+    }
+};
+
+// route middleware for simple API authentication
+function authenticateSession(\Slim\Route $route) {
+    $app = \Slim\Slim::getInstance();
+    $uid = $app->getEncryptedCookie('user_id');
+    $key = $app->getEncryptedCookie('session_id');
+    if (validateUserKey($uid, $key) === false) {
+        $app->halt(401);
+    }
+}
+
 function generateSession($user_id, $session_id) {
     $sql = "INSERT INTO last_login_tb (user_id, session_id) VALUES (:user_id, :session_id)";
     try {
@@ -58,6 +79,7 @@ function generateSession($user_id, $session_id) {
         $stmt->execute();
         if($db->lastInsertId()) {
             echo json_encode("new: ".$session_id);
+            setSessionOnBrowser($user_id, $session_id);
         } else {
             echo json_encode(false);
         }
