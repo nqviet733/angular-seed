@@ -7,6 +7,7 @@ $app = new \Slim\Slim(array(
     'debug' => true
 ));
 
+$app->get('/session/:id', 'checkSession');
 $app->post('/login', 'checkAuthentication');
 $app->get('/authenticate', 'generateAPIKey');
 $app->get('/friends', 'authenticate','getFriends');
@@ -30,13 +31,55 @@ function checkAuthentication() {
         $stmt->bindParam("username", $data->username);
         $stmt->bindParam("password", $data->password);
         $stmt->execute();
-        if($hello = $stmt->fetchObject()) {
-            echo json_encode(true);
+        $hello = $stmt->fetchObject();
+        $db = null;
+        if($hello) {
+            $status = checkSession($hello->id);
+            if ($status == null) {
+                generateSession($hello->id, $data->username . $data->password);
+            } else {
+                echo json_encode("existing: ".$status);
+            }
+        } else {
+            echo json_encode(false);
+        }
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+function generateSession($user_id, $session_id) {
+    $sql = "INSERT INTO last_login_tb (user_id, session_id) VALUES (:user_id, :session_id)";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("user_id", $user_id);
+        $stmt->bindParam("session_id", $session_id);
+        $stmt->execute();
+        if($db->lastInsertId()) {
+            echo json_encode("new: ".$session_id);
         } else {
             echo json_encode(false);
         }
         $db = null;
-        //echo '{"friends": ' . json_encode($hello) . '}';
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+function checkSession($user_id){
+    $sql = "SELECT * FROM last_login_tb WHERE user_id=:user_id";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("user_id", $user_id);
+        $stmt->execute();
+        if ($hello = $stmt->fetchObject()) {
+            $db = null;
+            return $hello->session_id;
+        } else {
+            return null;
+        }
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
