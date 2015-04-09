@@ -9,7 +9,7 @@ $app = new \Slim\Slim(array(
 ));
 
 $app->get('/session/:uid/:sid', 'validateSession');
-$app->post('/login', 'checkAuthentication');
+$app->post('/login', 'login');
 $app->get('/authenticate', 'generateAPIKey');
 $app->get('/friends', 'authenticateSession','getFriends');
 $app->get('/friend/:id',  'getFriend');
@@ -21,7 +21,7 @@ $app->get('/friend/search/:query', 'findByName');
 $app->run();
 
 //curl -i -X POST -H 'Content-Type: application/json' -d '{"username":"ntkthoa","password":"123456"}' http://127.0.0.1:8080/php-service/login
-function checkAuthentication() {
+function login() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $data = json_decode($body);
@@ -32,22 +32,32 @@ function checkAuthentication() {
         $stmt->bindParam("username", $data->username);
         $stmt->bindParam("password", $data->password);
         $stmt->execute();
-        $hello = $stmt->fetchObject();
+        $user = $stmt->fetchObject();
         $db = null;
-        if($hello) {
-            $status = checkSession($hello->id);
-            if ($status == null) {
-                generateSession($hello->id, $data->username . $data->password);
+        if($user) {
+            $userSession = checkSession($user->id);
+            echo json_encode($userSession);
+            if ($userSession) {
+                updateSession($userSession->user_id);
+                echo json_encode("session existing: ".$userSession->session_id);
+                $uID = $userSession->user_id;
+                $sID = $userSession->session_id;
             } else {
-                //TODO: this should check session valid before update it
-                updateSession($hello->id);
-                echo json_encode("existing: ".$status);
+                echo json_encode($user->id);
+                echo json_encode($data->username . $data->password);
+                if (generateSession($user->id, $data->username . $data->password)) {
+                    $uID = $user->id;
+                    $sID = $data->username . $data->password;
+                }
             }
+            setSessionOnBrowser($uID, $sID);
         } else {
             echo json_encode(false);
+            return false;
         }
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
+        return "error";
     }
 }
 
@@ -100,12 +110,16 @@ function validateSession($user_id, $session_id){
             echo json_encode($minutes);
 
             //TODO: if $minutes > 10 delete session else updateSession()
+            if ($minutes > 10) {
+                return false;
+            }
             return true;
         } else {
             return false;
         }
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
+        return false;
     }
 }
 
@@ -148,13 +162,16 @@ function generateSession($user_id, $session_id) {
         $stmt->execute();
         if($db->lastInsertId()) {
             echo json_encode("new: ".$session_id);
-            setSessionOnBrowser($user_id, $session_id);
+            return true;
+            //setSessionOnBrowser($user_id, $session_id);
         } else {
             echo json_encode(false);
+            return false;
         }
         $db = null;
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
+        return "error";
     }
 }
 
@@ -165,14 +182,15 @@ function checkSession($user_id){
         $stmt = $db->prepare($sql);
         $stmt->bindParam("user_id", $user_id);
         $stmt->execute();
-        if ($hello = $stmt->fetchObject()) {
+        if ($sessionObject = $stmt->fetchObject()) {
             $db = null;
-            return $hello->session_id;
+            return $sessionObject;
         } else {
-            return null;
+            return false;
         }
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
+        return "error";
     }
 }
 
