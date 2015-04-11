@@ -8,19 +8,19 @@ $app = new \Slim\Slim(array(
     'debug' => true
 ));
 
-$app->get('/session/:uid/:sid', 'validateSession');
+//$app->get('/session/:uid/:sid', 'validateSession');
 $app->post('/login', 'login');
-$app->get('/authenticate', 'generateAPIKey');
 $app->get('/friends', 'authenticateSession','getFriends');
-$app->get('/friend/:id',  'getFriend');
-$app->post('/friends', 'addFriend');
-$app->put('/friend/:id', 'updateFriend');
-$app->delete('/friend/:id', 'deleteFriend');
-$app->get('/friend/search/:query', 'findByName');
+$app->get('/friend/:id', 'authenticateSession', 'getFriend');
+$app->post('/friends', 'authenticateSession','addFriend');
+$app->put('/friend/:id','authenticateSession', 'updateFriend');
+$app->delete('/friend/:id', 'authenticateSession', 'deleteFriend');
+$app->get('/friend/search/:query', 'authenticateSession', 'findByName');
 
 $app->run();
 
 //curl -i -X POST -H 'Content-Type: application/json' -d '{"username":"ntkthoa","password":"123456"}' http://127.0.0.1:8080/php-service/login
+//Check  user/pass
 function login() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
@@ -61,18 +61,20 @@ function login() {
     }
 }
 
+
+//Set session for browser
 function setSessionOnBrowser($user_id, $session_id) {
     $app = \Slim\Slim::getInstance();
     try {
-        $app->setEncryptedCookie('user_id', $user_id, '5 minutes');
-        $app->setEncryptedCookie('session_id', $session_id, '5 minutes');
+        $app->setEncryptedCookie('user_id', $user_id, '1 minutes');
+        $app->setEncryptedCookie('session_id', $session_id, '1 minutes');
     } catch (Exception $e) {
         $app->response()->status(400);
         $app->response()->header('X-Status-Reason', $e->getMessage());
     }
 };
 
-// route middleware for simple API authentication
+// route API to authenticate
 function authenticateSession(\Slim\Route $route) {
     $app = \Slim\Slim::getInstance();
     $user_id = $app->getEncryptedCookie('user_id');
@@ -82,6 +84,7 @@ function authenticateSession(\Slim\Route $route) {
     }
 }
 
+//Check session valid or not
 function validateSession($user_id, $session_id){
     $sql = "SELECT * FROM last_login_tb WHERE user_id=:user_id and session_id=:session_id";
     try {
@@ -110,8 +113,10 @@ function validateSession($user_id, $session_id){
             echo json_encode($minutes);
 
             //TODO: if $minutes > 10 delete session else updateSession()
-            if ($minutes > 10) {
+            if ($minutes > 1) {
                 return false;
+            } else {
+                updateSession($user_id);
             }
             return true;
         } else {
@@ -123,6 +128,7 @@ function validateSession($user_id, $session_id){
     }
 }
 
+//Update lifetime for sesssion
 function updateSession($user_id) {
     $sql = "UPDATE last_login_tb SET last_login_time=:last_login_time where user_id=:user_id";
     try {
@@ -144,6 +150,21 @@ function updateSession($user_id) {
     }
 }
 
+//Delete session
+function deleteSession($user_id) {
+    $sql = "DELETE FROM last_login_tb WHERE user_id=:user_id";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("user_id", $user_id);
+        $stmt->execute();
+        $db = null;
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+//Generate session
 function generateSession($user_id, $session_id) {
     $sql = "INSERT INTO last_login_tb (user_id, session_id, last_login_time) VALUES (:user_id, :session_id, :last_login_time)";
     try {
@@ -175,6 +196,7 @@ function generateSession($user_id, $session_id) {
     }
 }
 
+//Check session
 function checkSession($user_id){
     $sql = "SELECT * FROM last_login_tb WHERE user_id=:user_id";
     try {
@@ -193,38 +215,6 @@ function checkSession($user_id){
         return "error";
     }
 }
-
-// route middleware for simple API authentication
-function authenticate(\Slim\Route $route) {
-    $app = \Slim\Slim::getInstance();
-    $uid = $app->getEncryptedCookie('uid');
-    $key = $app->getEncryptedCookie('key');
-    if (validateUserKey($uid, $key) === false) {
-        $app->halt(401);
-    }
-}
-
-function validateUserKey($uid, $key) {
-    // insert your (hopefully more complex) validation routine here
-    if ($uid == 'demo' && $key == 'demo') {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-// generates a temporary API key using cookies
-// call this first to gain access to protected API methods
-function generateAPIKey() {
-    $app = \Slim\Slim::getInstance();
-    try {
-        $app->setEncryptedCookie('uid', 'demo', '5 minutes');
-        $app->setEncryptedCookie('key', 'demo', '5 minutes');
-    } catch (Exception $e) {
-        $app->response()->status(400);
-        $app->response()->header('X-Status-Reason', $e->getMessage());
-    }
-};
 
 function getFriends() {
     $sql = "SELECT id, name, job FROM friends";
