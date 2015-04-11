@@ -76,31 +76,147 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pasca
         $scope.products = [
             {
                 id: 1,
-                title: "product1",
-                imgUrl: "view1/img.jpg",
-                price: 20,
-                detailPage: "detailURl"
+                title: "Dâu Tây Đà Lạt",
+                imgUrl: "view1/hatgiong/dautay/1.jpg",
+                price: 20000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
             },
             {
                 id: 2,
-                title: "product2",
-                imgUrl: "view1/img.jpg",
-                price: 30,
-                detailPage: "detailURl"
+                title: "Dâu Tây Đà Lạt",
+                imgUrl: "view1/hatgiong/dautay/2.jpg",
+                price: 30000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
             },
             {
                 id: 3,
-                title: "product3",
-                imgUrl: "view1/img.jpg",
-                price: 40,
-                detailPage: "detailURl"
+                title: "Dâu Tây Đà Lạt",
+                imgUrl: "view1/hatgiong/dautay/3.jpg",
+                price: 30000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
             },
             {
                 id: 4,
-                title: "product4",
-                imgUrl: "view1/img.jpg",
-                price: 50,
-                detailPage: "detailURl"
+                title: "Dâu Tây Đà Lạt",
+                imgUrl: "view1/hatgiong/dautay/4.jpg",
+                price: 50000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
+            },
+            {
+                id: 5,
+                title: "Dâu Tây Đà Lạt",
+                imgUrl: "view1/hatgiong/dautay/5.jpg",
+                price: 50000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
+            },
+            {
+                id: 6,
+                title: "Hướng Dương Nhật Bản",
+                imgUrl: "view1/hatgiong/huongduong/1.jpg",
+                price: 50000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
+            },
+            {
+                id: 7,
+                title: "Hướng Dương Nhật Bản",
+                imgUrl: "view1/hatgiong/huongduong/2.jpg",
+                price: 50000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
+            },
+            {
+                id: 8,
+                title: "Hướng Dương Nhật Bản",
+                imgUrl: "view1/hatgiong/huongduong/3.jpg",
+                price: 50000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
+            },
+            {
+                id: 9,
+                title: "Hướng Dương Nhật Bản",
+                imgUrl: "view1/hatgiong/huongduong/4.jpg",
+                price: 50000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
+            },
+            {
+                id: 1,
+                title: "Dâu Tây Đà Lạt",
+                imgUrl: "view1/hatgiong/dautay/1.jpg",
+                price: 20000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
+            },
+            {
+                id: 2,
+                title: "Dâu Tây Đà Lạt",
+                imgUrl: "view1/hatgiong/dautay/2.jpg",
+                price: 30000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
+            },
+            {
+                id: 3,
+                title: "Dâu Tây Đà Lạt",
+                imgUrl: "view1/hatgiong/dautay/3.jpg",
+                price: 30000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
+            },
+            {
+                id: 4,
+                title: "Dâu Tây Đà Lạt",
+                imgUrl: "view1/hatgiong/dautay/4.jpg",
+                price: 50000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
+            },
+            {
+                id: 5,
+                title: "Dâu Tây Đà Lạt",
+                imgUrl: "view1/hatgiong/dautay/5.jpg",
+                price: 50000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
+            },
+            {
+                id: 6,
+                title: "Hướng Dương Nhật Bản",
+                imgUrl: "view1/hatgiong/huongduong/1.jpg",
+                price: 50000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
+            },
+            {
+                id: 7,
+                title: "Hướng Dương Nhật Bản",
+                imgUrl: "view1/hatgiong/huongduong/2.jpg",
+                price: 50000,
+                detailPage: "Xem Chi Tiết",
+                lifeTime: "20 ngày",
+                seedsCount: 30
             },
         ]
         $scope.sayHello = function () {
@@ -129,7 +245,7 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pasca
             //console.log($scope.from);
             //console.log($scope.to);
             return item.price >= ($scope.from === undefined || $scope.from === null ? 0 : $scope.from)
-                && item.price <= ($scope.to === undefined || $scope.to === null ? 100 : $scope.to) ;
+                && item.price <= ($scope.to === undefined || $scope.to === null ? 100000 : $scope.to) ;
         };
     }])
 
@@ -142,7 +258,7 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pasca
             var newItems = [];
             for (var i = 0; i < items.length; i++) {
                 if (items[i].price >= (from === undefined || from === null ? 0 : from)
-                    && items[i].price <= (to === undefined || to === null ? 100 : to)) {
+                    && items[i].price <= (to === undefined || to === null ? 100000 : to)) {
                     newItems.push(items[i]);
                 }
             };

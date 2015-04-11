@@ -1,28 +1,61 @@
 <div ng-controller="View1Ctrl" class="container" xmlns="http://www.w3.org/1999/html">
     <p>This is the partial for view 1.</p>
-    <input type="text" class="form-control" placeholder="Search for.." ng-model="product.title">
-    <input type="number" class="form-control" placeholder="Price from.." ng-model="from">
-    <input type="number" class="form-control" placeholder="Price to.." ng-model="to">
+
+    <div class="row">
+        <!--<div class="col-xs-3">
+            Nhập Tên Hoa: <input type="text" class="form-control" placeholder="Tên hoa..." ng-model="product.title">
+        </div>-->
+        <form class="form-inline">
+            <div class="input-group col-xs-5">
+                <div class="input-group-addon">Tên Hoa</div>
+                <input type="text" class="form-control" placeholder="Tên hoa..." ng-model="product.title">
+            </div>
+
+            <!--<div class="col-xs-3">
+                Nhập Giá Thấp Nhất Từ: <input type="number" class="form-control" placeholder="Giá thấp nhất từ..." ng-model="from">
+            </div>-->
+
+            <div class="input-group col-xs-3">
+                <div class="input-group-addon">Giá Thấp Nhất</div>
+                <input type="number" class="form-control" placeholder="Giá thấp nhất từ..." ng-model="from">
+
+                <div class="input-group-addon">đ</div>
+            </div>
+
+            <!-- <div class="col-xs-3">
+                 Nhập Giá Cao Nhất Từ: <input type="number" class="form-control" placeholder="Giá cao nhất từ..." ng-model="to">
+             </div>-->
+
+            <div class="input-group col-xs-3">
+                <div class="input-group-addon">Giá Cao Nhất</div>
+                <input type="number" class="form-control" placeholder="Giá cao nhất từ..." ng-model="to">
+
+                <div class="input-group-addon">đ</div>
+            </div>
+        </form>
+
+    </div>
+
     <br/>
     <div class="row" style="border-left: 1px solid #ddd;border-top: 1px solid #ddd;">
         <!-- Two ways to filter -->
         <!-- <div class="col-sm-3" ng-repeat="product in products | filter:product | findProductPrice:from:to" -->
-        <div class="col-sm-3" ng-repeat="product in products | filter:product | filter: getProductsByPrice"
+        <div class="col-sm-3 bg-success" ng-repeat="product in products | filter:product | filter: getProductsByPrice"
              style="border-right: 1px solid #ddd;border-bottom: 1px solid #ddd; cursor: pointer" ng-click="sayHello()">
-            <span style="text-align: center">{{product.title}}</span>
-
             <div style="text-align: center">
-                <a href="#/details/{{product.id}}" class="thumb"><img src="{{product.imgUrl}}"></a>
+                <a href="#/details/{{product.id}}" class="thumb"><img class="img-thumbnail img-responsive" style="height: 200px" src="{{product.imgUrl}}"></a>
             </div>
-            <span style="color: red">Price: {{product.price}}</span></br>
-            <span>{{product.detailPage}}</span>
+            <span style="float: left">{{product.title}}</span><span style="color: red; float: right">Giá: {{product.price | number:0}} đ</span></br>
+            <button type="button" class="btn btn-success btn-xs btn-block" popover-template="view1/pop-over.html" popover-trigger="mouseenter" popover-placement="auto top">{{product.detailPage}}</button>
+            </br>
+            </br>
         </div>
     </div>
     <br/>
-    <button class="btn btn-danger" ng-click="launch('error')">Error Dialog</button>
+    <!--<button class="btn btn-danger" ng-click="launch('error')">Error Dialog</button>
     <button class="btn btn-default" ng-click="launch('notify')">Notify Dialog</button>
-    <button popover-placement="right" popover-template="view1/pop-over.html" popover-trigger="mouseenter" class="btn btn-default">Date Picker
-    </button>
+    <button popover-template="view1/pop-over.html" popover-trigger="mouseenter" class="btn btn-default">Date Picker
+    </button>-->
 </div>
 <!--
     https://github.com/jbruni/bootstrap-bower-jbruni

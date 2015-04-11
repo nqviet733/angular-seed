@@ -1,4 +1,6 @@
 <div class="popover-content">
-    <h1>Hello!</h1>
-    <button ng-click="sayHello()">Say Hello</button>
+    <p>Tên: {{product.title}}</p>
+    <p style="color: red">Giá: {{product.price | number: 0}} đ</p>
+    <p style="color: red">Số Lượng Hạt: {{product.seedsCount}}</p>
+    <p>Thời Gian Sinh Trưởng: {{product.lifeTime}}</p>
 </div>
