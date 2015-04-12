@@ -1,57 +1,51 @@
 <div ng-controller="View1Ctrl" class="container" xmlns="http://www.w3.org/1999/html">
-    <p>This is the partial for view 1.</p>
-
-    <div class="row">
-        <!--<div class="col-xs-3">
-            Nhập Tên Hoa: <input type="text" class="form-control" placeholder="Tên hoa..." ng-model="product.title">
-        </div>-->
-        <form class="form-inline">
+    <nav class="container navbar navbar-default navbar-fixed-bottom" style="background-color: #d9534f" ng-show="toggleSearchBar">
+        <form class="form-inline container center-block" style="margin-top: 8px">
             <div class="input-group col-xs-5">
-                <div class="input-group-addon">Tên Hoa</div>
+                <div class="input-group-addon">Tên Hạt Giống Hoa</div>
                 <input type="text" class="form-control" placeholder="Tên hoa..." ng-model="product.title">
             </div>
-
-            <!--<div class="col-xs-3">
-                Nhập Giá Thấp Nhất Từ: <input type="number" class="form-control" placeholder="Giá thấp nhất từ..." ng-model="from">
-            </div>-->
-
             <div class="input-group col-xs-3">
-                <div class="input-group-addon">Giá Thấp Nhất</div>
                 <input type="number" class="form-control" placeholder="Giá thấp nhất từ..." ng-model="from">
 
                 <div class="input-group-addon">đ</div>
             </div>
-
-            <!-- <div class="col-xs-3">
-                 Nhập Giá Cao Nhất Từ: <input type="number" class="form-control" placeholder="Giá cao nhất từ..." ng-model="to">
-             </div>-->
-
             <div class="input-group col-xs-3">
-                <div class="input-group-addon">Giá Cao Nhất</div>
                 <input type="number" class="form-control" placeholder="Giá cao nhất từ..." ng-model="to">
 
                 <div class="input-group-addon">đ</div>
             </div>
+            <button type="button" class="btn btn-default" aria-label="Left Align" ng-click="toggleSearchBar=!toggleSearchBar">
+                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+            </button>
         </form>
 
-    </div>
-
-    <br/>
-    <div class="row" style="border-left: 1px solid #ddd;border-top: 1px solid #ddd;">
+    </nav>
+    <nav class="container navbar navbar-default navbar-fixed-bottom" style="background-color: #F9F9F9;" ng-show="!toggleSearchBar">
+        <button type="button" class="btn btn-default" aria-label="Left Align" ng-click="toggleSearchBar=!toggleSearchBar">
+            <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+        </button>
+    </nav>
+    <div class="row" style="border-left: 1px solid #ddd;border-top: 1px solid #ddd; margin-bottom: 50px">
         <!-- Two ways to filter -->
         <!-- <div class="col-sm-3" ng-repeat="product in products | filter:product | findProductPrice:from:to" -->
         <div class="col-sm-3 bg-success" ng-repeat="product in products | filter:product | filter: getProductsByPrice"
              style="border-right: 1px solid #ddd;border-bottom: 1px solid #ddd; cursor: pointer" ng-click="sayHello()">
             <div style="text-align: center">
-                <a href="#/details/{{product.id}}" class="thumb"><img class="img-thumbnail img-responsive" style="height: 200px" src="{{product.imgUrl}}"></a>
+                <a href="#/details/{{product.id}}" class="thumb"><img class="img-thumbnail img-responsive"
+                                                                      style="height: 200px"
+                                                                      src="{{product.imgUrl}}"></a>
             </div>
-            <span style="float: left">{{product.title}}</span><span style="color: red; float: right">Giá: {{product.price | number:0}} đ</span></br>
-            <button type="button" class="btn btn-success btn-xs btn-block" popover-template="view1/pop-over.html" popover-trigger="mouseenter" popover-placement="auto top">{{product.detailPage}}</button>
-            </br>
+            <span style="float: left; font-weight: bold;">{{product.title}}</span><span
+                style="color: red; float: right">Giá: {{product.price | number:0}} đ</span></br>
+            <button type="button" class="btn btn-success btn-xs btn-block" popover-template="view1/pop-over.html"
+                    popover-placement="auto top">{{product.detailPage}}
+            </button>
             </br>
         </div>
     </div>
-    <br/>
+
+
     <!--<button class="btn btn-danger" ng-click="launch('error')">Error Dialog</button>
     <button class="btn btn-default" ng-click="launch('notify')">Notify Dialog</button>
     <button popover-template="view1/pop-over.html" popover-trigger="mouseenter" class="btn btn-default">Date Picker

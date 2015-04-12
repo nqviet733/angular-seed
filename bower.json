@@ -15,7 +15,8 @@
         "angular-mocks": "~1.2.x",
         "angular-resource": "~1.2.x",
         "html5-boilerplate": "~4.3.0",
-        "angular-dialog-service": "5.2.6"
+        "angular-dialog-service": "5.2.6",
+        "bootstrap-table" : "1.7.0"
     },
     "resolutions": {
         "angular": "~1.2.x"

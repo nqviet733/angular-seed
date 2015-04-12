@@ -28,5 +28,7 @@
   content: "";
   padding: 0;
 }
-
+.popover-inner {
+    background-color: #F5F5F5;
+}
 

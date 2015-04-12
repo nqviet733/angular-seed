@@ -247,6 +247,7 @@ angular.module('myApp.view1', ['ngRoute', 'ui.bootstrap', 'dialogs.main', 'pasca
             return item.price >= ($scope.from === undefined || $scope.from === null ? 0 : $scope.from)
                 && item.price <= ($scope.to === undefined || $scope.to === null ? 100000 : $scope.to) ;
         };
+        $scope.toggleSearchBar = true;
     }])
 
 
