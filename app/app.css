@@ -1,6 +1,6 @@
 /* app css stylesheet */
 
-.menu {
+/*.menu {
   list-style: none;
   border-bottom: 0.1em solid black;
   margin-bottom: 2em;
@@ -30,5 +30,12 @@
 }
 .popover-inner {
     background-color: #F5F5F5;
-}
+}*/
 
+li:hover {
+    background-color:#fb6427;
+    cursor: pointer;
+}
+li > a:hover {
+    text-decoration: none;
+}
